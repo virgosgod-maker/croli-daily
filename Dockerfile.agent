@@ -1,0 +1,42 @@
+# Croli headless 运行环境：croli-server + croli-cli + deepseek-acp
+# 用来在 NAS 上真跑一次对话，让服务端自己记上「每日首次对话」。
+FROM node:24-bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl git tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# deepseek-acp 要求 Node >= 22.19
+RUN npm install -g deepseek-acp@0.11.0 && npm cache clean --force
+
+# 打两处补丁，都是为了适配 ds.croli.net 这个中转：
+#   1. reasoningEffort 硬编码为 'high'，线上发 thinking:{type:"enabled"}，
+#      中转直接回 400 Invalid Anthropic Messages API request。
+#      改成 'off' 后发的是 thinking:{type:"disabled"}，实测 200。
+#   2. 默认 max_tokens 256000 超出免费额度，中转回 402，
+#      由 settings.yaml 的 maxTokens 覆盖（见下）。
+RUN BOOT="$(npm root -g)/deepseek-acp/lib/launcher/boot.js" \
+    && sed -i "s/reasoningEffort: 'high'/reasoningEffort: 'off'/" "$BOOT" \
+    && grep -q "reasoningEffort: 'off'" "$BOOT"
+
+# Croli 的 Linux 二进制（build context 里的 .tmp/croli-linux）
+COPY .tmp/croli-linux /opt/croli/bin
+RUN chmod +x /opt/croli/bin/croli-server /opt/croli/bin/croli-cli /opt/croli/bin/croli-mcp \
+    && ln -sf /opt/croli/bin/croli-cli /usr/local/bin/croli-cli \
+    && ln -sf /opt/croli/bin/croli-server /usr/local/bin/croli-server
+
+# maxTokens 必须限住：中转按 max_tokens 预留额度，256000 会 402
+COPY docker/settings.agent.yaml /opt/agent-settings.yaml
+
+ENV LD_LIBRARY_PATH=/opt/croli/bin/lib \
+    DSH_HOME=/data/.dsh \
+    DEEPSEEK_BASE_URL=https://ds.croli.net/v1 \
+    DEEPSEEK_ACP_MODEL=DeepSeek-V4.1-Flash \
+    CROLI_DATA_DIR=/data \
+    CROLI_PORT=3080 \
+    CROLI_HOST=127.0.0.1
+
+WORKDIR /work
+EXPOSE 3080
+ENTRYPOINT ["/usr/bin/tini","--"]
+CMD ["croli-server"]

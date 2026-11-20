@@ -1,0 +1,9 @@
+node_modules
+test
+docs
+launchd
+deploy
+magpie-plugin
+*.log
+.env
+.tmp/dskey

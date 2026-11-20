@@ -1,0 +1,26 @@
+# Croli 的 agent 栈：croli-server + deepseek-acp，让每日首次对话能真跑。
+# 与 croli-daily（签到 + 面板）分开起，互不依赖。
+#
+#   docker compose -f deploy/docker-compose.agent.yml up -d
+#
+# 前提：/volume1/docker/croli-daily/agent-data/key 里是有效的 DEEPSEEK_API_KEY。
+services:
+  croli-agent:
+    build:
+      context: ..
+      dockerfile: Dockerfile.agent
+    image: croli-agent:local
+    container_name: croli-agent
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      DSH_HOME: /data/.dsh
+      DEEPSEEK_BASE_URL: https://ds.croli.net/v1
+      DEEPSEEK_ACP_MODEL: DeepSeek-V4.1-Flash
+    env_file:
+      - /volume1/docker/croli-daily/agent-data/agent.env
+    volumes:
+      - /volume1/docker/croli-daily/agent-data:/data
+    # 只在 croli-daily 的网络里可达，不对外暴露端口
+    expose:
+      - "3080"

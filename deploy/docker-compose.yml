@@ -1,0 +1,25 @@
+services:
+  croli-daily:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: croli-daily:local
+    container_name: croli-daily
+    restart: unless-stopped
+    ports:
+      # 只在内网 / Tailscale 暴露：手机打开 http://<nas-ip>:8787/
+      - "8787:8787"
+    environment:
+      TZ: Asia/Shanghai
+      CROLI_AUTH_FILE: /data/auth.json
+      CROLI_STATE_DIR: /data/state
+      # 两个任务都自动做（首次对话需要 NAS 上能跑 croli-cli，见 docs/deploy-nas.md）
+      DAILY_CHAT_MODE: ${DAILY_CHAT_MODE:-off}
+      RUN_AT_HOUR: "0"
+      RUN_AT_MINUTE: "10"
+      DASHBOARD_PORT: "8787"
+      # 可选：设置后面板需带 ?token=xxx 才能访问
+      # DASHBOARD_TOKEN: "换成你的口令"
+    volumes:
+      # 读写挂载：容器是凭据的唯一写入方（refresh token 轮换后必须写回）
+      - /volume1/docker/croli-daily/data:/data

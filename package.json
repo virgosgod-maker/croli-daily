@@ -1,0 +1,17 @@
+{
+  "name": "croli-daily",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily check-in and first-conversation tasks for Croli, with a single-writer token store.",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "croli-daily": "src/cli.mjs"
+  },
+  "scripts": {
+    "status": "node src/cli.mjs status",
+    "run": "node src/cli.mjs run"
+  }
+}

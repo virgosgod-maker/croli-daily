@@ -1,0 +1,14 @@
+# deepseek-acp 读取 $DSH_HOME/settings.yaml。
+# maxTokens 必须显式给出：deepseek-acp 默认 256000，
+# ds.croli.net 中转会按它预留额度并返回 402（需要更多 credits）。
+llm-deepseek:
+  models:
+    - id: DeepSeek-V4.1-Flash
+      name: DeepSeek-V4.1-Flash
+      description: 更快更省，日常编码的默认档。
+      contextWindow: 1000000
+      maxTokens: 32000
+      inputModalities:
+      - text
+      - image
+      systemPromptUpdate: in-history

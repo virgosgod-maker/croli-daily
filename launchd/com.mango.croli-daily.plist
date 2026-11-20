@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.mango.croli-daily</string>
+
+  <!-- 常驻：内嵌每日调度 + 网页面板，不依赖 launchd 的日历触发 -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>node</string>
+    <string>src/cli.mjs</string>
+    <string>serve</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/mango/work/code/github/croli-daily</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/mango/.local/state/croli-daily/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/mango/.local/state/croli-daily/launchd.err.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>DASHBOARD_HOST</key>
+    <string>127.0.0.1</string>
+  </dict>
+</dict>
+</plist>
