@@ -30,7 +30,12 @@ node --test test/            # 10 项测试
 `magpie-plugin/` 是一个真正的喜鹊插件：用 `auth.usage` 把**总积分 / 今日免费额度 /
 剩余重置次数**画进喜鹊的 Usage 卡片，用 `auth.checkin` 每天自动签到。
 
-插件在独立仓库：**https://github.com/virgosgod-maker/magpie-croli**
+插件在**独立仓库**（本仓库根目录只有 `bin`，喜鹊装不了）：
+
+> ⚠️ 别对本仓库执行 `magpie plugin add`，会报
+> "isn't an OpenCode or magpie plugin: ... only a command (bin)"
+
+正确做法：
 
 ```bash
 magpie plugin add github:virgosgod-maker/magpie-croli
